@@ -1,12 +1,18 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import Http404
+
+from inventory.models import Item 
+
 
 def index(request):
-	return HttpResponse('<p>The index view</p>')
+	items = Item.objects.exclude(amount=0)
+	return render(request, 'inventory/index.html', {'items': items,})
 
 def item_detail(request, id):
-	return HttpResponse('<p>The item_detail view to id {0}</p>'.format(id))
-
-# Create your views here.
+	try:
+		item = Item.objects.get(id=id)
+	except Item.DoesNotExist:
+		raise Http404('This item does not exist')
+	return render(request, 'inventory/item_detail.html', {'item':item, })
 
 
